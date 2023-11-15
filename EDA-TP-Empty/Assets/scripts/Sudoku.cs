@@ -31,7 +31,6 @@ public class Sudoku : MonoBehaviour
     float phase;
     float samplingF = 48000;
 
-
     void Start()
     {
         long mem = System.GC.GetTotalMemory(true);
@@ -77,7 +76,7 @@ public class Sudoku : MonoBehaviour
 
 
     //IMPLEMENTAR
-    int watchdog = 0;
+        int watchdog = 0;
     bool RecuSolve(Matrix<int> matrixParent, int x, int y, int protectMaxDepth, List<Matrix<int>> solution)
     {
         watchdog--;
@@ -106,7 +105,6 @@ public class Sudoku : MonoBehaviour
                 matrixParent[x, y] = num;
 
                 solution.Add(matrixParent.Clone());
-
 
                 if (RecuSolve(matrixParent, x + 1, y, protectMaxDepth, solution))
                 {
@@ -146,7 +144,7 @@ public class Sudoku : MonoBehaviour
         for (int i = 0; i < seq.Count; i++)
         {
             TranslateAllValues(seq[i]);
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(stepDuration);
 
         }
 
@@ -181,7 +179,7 @@ public class Sudoku : MonoBehaviour
     //}
     #endregion
 
-    #region SOLVED SUDOKU CHATGPT
+    #region SOLVED SUDOKU NEW
     void SolvedSudoku()
     {
         StopAllCoroutines();
