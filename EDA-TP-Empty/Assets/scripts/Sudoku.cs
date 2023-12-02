@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Linq;
 
 
 public class Sudoku : MonoBehaviour
@@ -42,7 +43,7 @@ public class Sudoku : MonoBehaviour
         CreateEmptyBoard();
         ClearBoard();
 
-        CreateNew();
+        CreateSudoku();
     }
 
     void ClearBoard()
@@ -76,7 +77,7 @@ public class Sudoku : MonoBehaviour
 
 
     //IMPLEMENTAR
-        int watchdog = 0;
+    int watchdog = 0;
     bool RecuSolve(Matrix<int> matrixParent, int x, int y, int protectMaxDepth, List<Matrix<int>> solution)
     {
         watchdog--;
@@ -108,7 +109,7 @@ public class Sudoku : MonoBehaviour
 
                 if (RecuSolve(matrixParent, x + 1, y, protectMaxDepth, solution))
                 {
-                    nums.Add(num);
+                    //nums.Add(num);
                     return true;
                 }
 
@@ -138,17 +139,18 @@ public class Sudoku : MonoBehaviour
         frequency = 440 + num * 80;
     }
 
+    int currentStep = 0;
     //IMPLEMENTAR - punto 3
     IEnumerator ShowSequence(List<Matrix<int>> seq)
     {
         for (int i = 0; i < seq.Count; i++)
         {
             TranslateAllValues(seq[i]);
+            currentStep = i + 1;
+            feedback.text = "Paso numero: " + currentStep + "/" + seq.Count;
             yield return new WaitForSeconds(stepDuration);
 
         }
-
-
     }
 
     void Update()
@@ -156,28 +158,10 @@ public class Sudoku : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R) || Input.GetMouseButtonDown(1))
             SolvedSudoku();
         else if (Input.GetKeyDown(KeyCode.C) || Input.GetMouseButtonDown(0))
-            CreateSudoku();
+            CreateSudoku(); 
     }
 
     //modificar lo necesario para que funcione.
-
-    #region SOLVEDSUDOKU POR DEFECTO
-    //void SolvedSudoku()
-    //{
-    //    StopAllCoroutines();
-    //    nums = new List<int>();
-    //    var solution = new List<Matrix<int>>();
-    //    watchdog = 100000;
-    //    //var result =false;//????
-    //    var result = RecuSolve(_createdMatrix, 0, 0, watchdog, solution);
-
-    //    long mem = System.GC.GetTotalMemory(true);
-    //    memory = string.Format("MEM: {0:f2}MB", mem / (1024f * 1024f));
-    //    canSolve = result ? " VALID" : " INVALID";
-    //    ////???
-    //    TranslateAllValues(_createdMatrix);
-    //}
-    #endregion
 
     #region SOLVED SUDOKU NEW
     void SolvedSudoku()
@@ -187,25 +171,6 @@ public class Sudoku : MonoBehaviour
         var solution = new List<Matrix<int>>();
         watchdog = 100000;
         var result = RecuSolve(_createdMatrix, 0, 0, 0, solution);
-
-        if (result)
-        {
-            // Sudoku resuelto
-            feedback.text = "Sudoku resuelto en " + solution.Count + " pasos";
-            canSolve = " VALID";
-        }
-        else
-        {
-            // No se encontró solución
-            feedback.text = "No se pudo resolver el Sudoku";
-            canSolve = " INVALID";
-        }
-
-        //      long mem = System.GC.GetTotalMemory(true);
-        //      memory = string.Format("MEM: {0:f2}MB", mem / (1024f * 1024f));
-        //      canSolve = result ? " VALID" : " INVALID";
-        //TranslateAllValues(_createdMatrix);
-
         StartCoroutine(ShowSequence(solution));
     }
     #endregion
@@ -219,16 +184,17 @@ public class Sudoku : MonoBehaviour
         List<Matrix<int>> l = new List<Matrix<int>>();
         watchdog = 100000;
         GenerateValidLine(_createdMatrix, 0, 0);
-        var result = false;
-        _createdMatrix = l[0].Clone();
+        var result = RecuSolve(_createdMatrix,0,1,0, l);
+        //_createdMatrix = l[0].Clone();
         LockRandomCells();
         ClearUnlocked(_createdMatrix);
         TranslateAllValues(_createdMatrix);
         long mem = System.GC.GetTotalMemory(true);
         memory = string.Format("MEM: {0:f2}MB", mem / (1024f * 1024f));
         canSolve = result ? " VALID" : " INVALID";
-        feedback.text = "Pasos: " + l.Count + "/" + l.Count + " - " + memory + " - " + canSolve;
+        // feedback.text = "Pasos: " + l.Count + "/" + l.Count + " - " + memory + " - " + canSolve;
     }
+
     void GenerateValidLine(Matrix<int> mtx, int x, int y)
     {
         int[] aux = new int[9];
@@ -377,4 +343,5 @@ public class Sudoku : MonoBehaviour
         }
         return aux;
     }
+
 }
